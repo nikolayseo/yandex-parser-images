@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale = 1.0"/>
+    <meta charset="UTF-8"/>
+    <title>ya-images</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        div.images-block {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+    </style>
+</head>
+<body>
+<div class="images-block"></div>
+<script src="socket.io.js"></script>
+<script>
+
+    const socket = io('http://localhost:3000', {
+        transports: ['websocket']
+    });
+
+    socket.on('connect', () => {
+        socket.emit('request-images');
+    });
+
+    socket.on('response-images', (data) => {
+
+        let imagesBlock = document.querySelector(".images-block");
+
+        if (data.length > 0) {
+            Array.from(data, (item) => {
+                imagesBlock.insertAdjacentHTML("afterbegin",
+                    `<div>
+                        <img width="220" height="300" alt="" src="${item.image_url}"/>
+                    </div>`);
+            });
+        } else {
+            imagesBlock.insertAdjacentHTML("afterbegin", `<div><h3>Картинки не найдены!</h3></div>`);
+        }
+    });
+
+</script>
+</body>
+</html>
